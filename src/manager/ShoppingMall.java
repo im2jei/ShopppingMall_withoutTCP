@@ -63,6 +63,7 @@ public class ShoppingMall extends JFrame {
 	ArrayList<String[]> initList = new ArrayList<>();
 //	private static ShoppingMall shop;
 	String id = null;
+	int chk = 0;
 
 	public ShoppingMall(String id) {
 		super("쇼핑몰");// super의 생성자 호출
@@ -148,6 +149,7 @@ public class ShoppingMall extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				String in[] = new String[5];
+				saveToDB(id, in, chk);
 				new Basketlist();
 			}
 
@@ -174,7 +176,7 @@ public class ShoppingMall extends JFrame {
 //		TableCellRenderer getTableCellRendererComponent = null;
 //		table.getColumn("체크").setCellRenderer(dcr);
 		box.addItemListener(new ItemListener() {
-			int chk = 0;
+			// chk = 0;
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -187,14 +189,20 @@ public class ShoppingMall extends JFrame {
 						in[i] = (String) table.getValueAt(table.getSelectedRow(), i);
 						chk = 1;
 					}
-
-					saveToDB(in, chk);
+					modIntRow = table.getSelectedRow();
+					for (int i = 0; i < initList.size(); i++) {
+//						initList.get(i).setText((String) table.getValueAt(modIntRow, i));
+					}
+					modIntRow = table.getSelectedRow();
+					System.out.println(chk);
+					// saveToDB(in, chk);
 					in[4] = String.valueOf(table.getSelectedRow());
 //					select = 1;
 				}
 			}
 		});
 	}
+
 //
 //	private DefaultTableCellRenderer dcr = new DefaultTableCellRenderer() {
 //		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
@@ -211,22 +219,21 @@ public class ShoppingMall extends JFrame {
 //		}
 //	};
 
-	private void saveToDB(String[] in, int chk) {
+	private void saveToDB(String id, String[] in, int chk) {
 		dto = new BasketlistDTO();
-		for (int i = 0; i < in.length; i++) {
-			dto.setB_no(dto.getB_no());
-			dto.setId(id);
-			int code = Integer.parseInt(in[2]);
-			dto.setCode(code);
-			dto.setCname(in[3]);
-			int cnt = Integer.parseInt(in[4]);
-			dto.setCnt(cnt);
-			int price = Integer.parseInt(in[5]);
-			dto.setPrice(price);
-			dto.setCheck(chk);
-			dao.Insert(dto);
+		// for (int i = 0; i < in.length; i++) {
+		dto.setId(id);
+		int code = Integer.parseInt(in[0]);
+		dto.setCode(code);
+		dto.setCname(in[1]);
+		int cnt = Integer.parseInt(in[2]);
+		dto.setCnt(cnt);
+		int price = Integer.parseInt(in[3]);
+		dto.setPrice(price);
+		dto.setCheck(chk);
+		dao.Insert(dto);
 
-		}
+		// }
 	}
 
 	private void createpanel() {

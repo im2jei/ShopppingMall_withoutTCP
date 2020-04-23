@@ -81,11 +81,13 @@ public class BasketlistDAO {
 				rs = stmt.executeQuery(sql);
 				while (rs.next()) {
 					BasketlistDTO dto = new BasketlistDTO();
-
+					dto.setB_no(rs.getInt("no"));
+					dto.setId(rs.getString("id"));
 					dto.setCode(rs.getInt("code"));
 					dto.setCname(rs.getString("cname"));
 					dto.setCnt(rs.getInt("cnt"));
 					dto.setPrice(rs.getInt("price"));
+					dto.setCheck(rs.getInt("chk"));
 					list.add(dto.getArray());
 				}
 			}

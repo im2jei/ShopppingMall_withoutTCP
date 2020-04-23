@@ -70,7 +70,7 @@ public class Basketlist extends JFrame {
 
 	public void init() {
 		initList = dao.getList();
-		for (int i = 0; i < initList.size(); i++) {
+		for (int i = 2; i < initList.size(); i++) {
 			tablemodel.addRow(initList.get(i));
 		}
 	}
