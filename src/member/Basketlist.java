@@ -1,18 +1,25 @@
 package member;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -40,8 +47,7 @@ public class Basketlist extends JFrame {
 	JPanel tab_south = new JPanel();
 	JPanel south_north = new JPanel();
 
-	JTextField[] txtfield = new JTextField[5];
-	JTextField tfield = null;
+	JTextField total = new JTextField(5);
 
 	int modIntRow = -1;
 
@@ -50,13 +56,20 @@ public class Basketlist extends JFrame {
 	BasketlistDAO dao = BasketlistDAO.getInstance();
 	BasketlistDTO dto = null;
 	ArrayList<String[]> initList = new ArrayList<>();
+	ArrayList<String[]> goodsList = new ArrayList<>();
+	ArrayList<BasketlistDTO> rlist = new ArrayList<>();
+	String id = null;
+	int chk = 1;
 
-	public Basketlist() {
+	public Basketlist(String id) {
 		super("장바구니");// super의 생성자 호출
+		this.id = id;
+
 		Dimension size = new Dimension(600, 400);
 		createpanel();
 		createtb();
 		tablesetting();
+		createchkbox();
 
 		init();
 
@@ -70,9 +83,10 @@ public class Basketlist extends JFrame {
 
 	public void init() {
 		initList = dao.getList();
-		for (int i = 2; i < initList.size(); i++) {
+		for (int i = 0; i < initList.size(); i++) {
 			tablemodel.addRow(initList.get(i));
 		}
+
 	}
 
 	public void tablesetting() {
@@ -113,7 +127,6 @@ public class Basketlist extends JFrame {
 		JLabel all = new JLabel("총 금액");
 		south_north.add(all);
 
-		JTextField total = new JTextField(5);
 		south_north.add(total);
 
 		JButton modB = new JButton("주문하기");
@@ -123,18 +136,91 @@ public class Basketlist extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				String in[] = new String[5];
 				modIntRow = -1;
+				makesDTO(id, goodsList, chk);
+				gotoInsert(dto);
+				JOptionPane.showMessageDialog(null, "주문이 완료되었습니다.");
+				new OrderList(id);
+				dispose();
 			}
 		});
 
 	}
 
-	private void saveToDB(String[] in) {
-		dto = new BasketlistDTO();
-		dto.setCode(Integer.parseInt(in[0]));
-		dto.setCname(in[1]);
-		dto.setCnt(Integer.parseInt(in[2]));
-		dto.setPrice(Integer.parseInt(in[3]));
-		dao.Insert(dto);
+	private void createchkbox() {
+		Container c = getContentPane();
+		JCheckBox box = new JCheckBox();
+		Component comp = this;
+		box.setHorizontalAlignment(JLabel.CENTER);
+		table.getColumn("체크").setCellEditor(new DefaultCellEditor(box));
+		box.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				box.setBorderPainted(true);
+				box.setHorizontalAlignment(JLabel.CENTER);
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					modIntRow = table.getSelectedRow();
+					String in[] = new String[5];
+					for (int i = 0; i < table.getColumnCount() - 1; i++) {
+						in[i] = (String) table.getValueAt(table.getSelectedRow(), i);
+						chk = 1;
+					}
+					System.out.println("chk: " + chk);
+					in[4] = String.valueOf(table.getSelectedRow());
+
+					if (chk == 2) {
+						String[] sarray = new String[5];
+						for (int i = 0; i < table.getColumnCount(); i++) {
+							String g = String.valueOf(table.getValueAt(table.getSelectedRow(), i));
+							sarray[i] = g;
+						}
+						goodsList.add(sarray);
+
+						for (int i = 0; i < in.length; i++) {
+							in[i] = total.getText();
+							total.setText("");
+							int sum = Integer.parseInt(in[2]) * Integer.parseInt(in[3]);
+							total.setText(String.valueOf(sum));
+							total = (JTextField) table.getValueAt(table.getSelectedRow(), sum);
+
+						}
+					}
+					for (String[] a : goodsList) {
+						for (int i = 0; i < a.length; i++) {
+							System.out.println("sarray" + "[" + i + "]" + a[i]);
+						}
+
+					}
+				}
+			}
+		});
+	}
+
+	private void makesDTO(String id, ArrayList<String[]> goodsList, int chk) {
+		for (int j = 0; j < goodsList.size(); j++) {
+			dto = new BasketlistDTO();
+			dto.setId(id);
+			int code = Integer.parseInt(goodsList.get(j)[0]);
+			dto.setCode(code);
+			dto.setCname(goodsList.get(j)[1]);
+			int cnt = Integer.parseInt(goodsList.get(j)[2]);
+			dto.setCnt(cnt);
+			int price = Integer.parseInt(goodsList.get(j)[3]);
+			dto.setPrice(price);
+			dto.setCheck(chk);
+			rlist.add(dto);
+		}
+		for (int j = 0; j < rlist.size(); j++) {
+			System.out.println("----------------------------");
+			System.out.println("rlist: " + rlist.get(j).getId());
+		}
+
+	}
+
+	private void gotoInsert(BasketlistDTO dto) {
+		for (int j = 0; j < rlist.size(); j++) {
+			dao.Insert(rlist.get(j));
+		}
 
 	}
 

@@ -52,15 +52,17 @@ public class GoodsDAO {
 		boolean result = false;
 		c.orclelode();
 		try {
-			String sql = "update goods set code=?,cname=?,cnt=?,price=? where code=?";
+			String sql = "update goods set code=?,cname=?,cnt=?,price=? chk=? where code=?";
 			PreparedStatement psmt = conn.prepareStatement(sql);
 			psmt.setInt(1, dto.getCode());
 			psmt.setString(2, dto.getCname());
 			psmt.setInt(3, dto.getCnt());
 			psmt.setInt(4, dto.getPrice());
 			psmt.setInt(5, dto.getCode());
+			psmt.setInt(6, dto.getCheck());
 			int r = psmt.executeUpdate();
-			System.out.println(dto.getCode() + "," + dto.getCname() + "," + dto.getCnt() + "," + dto.getPrice());
+			System.out.println(dto.getCode() + "," + dto.getCname() + "," + dto.getCnt() + "," + dto.getPrice() + ","
+					+ dto.getCheck());
 			if (r > 0) {
 				result = true;
 			}

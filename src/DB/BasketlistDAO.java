@@ -81,13 +81,34 @@ public class BasketlistDAO {
 				rs = stmt.executeQuery(sql);
 				while (rs.next()) {
 					BasketlistDTO dto = new BasketlistDTO();
-					dto.setB_no(rs.getInt("no"));
-					dto.setId(rs.getString("id"));
 					dto.setCode(rs.getInt("code"));
 					dto.setCname(rs.getString("cname"));
 					dto.setCnt(rs.getInt("cnt"));
 					dto.setPrice(rs.getInt("price"));
 					dto.setCheck(rs.getInt("chk"));
+					list.add(dto.getArray());
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return list;
+	}
+
+	public ArrayList<String[]> getListfororder() {
+		ArrayList<String[]> list = new ArrayList<String[]>();
+		String sql = "SELECT * FROM basketlist";
+		try {
+			stmt = conn.createStatement();
+			if (stmt != null) {
+				rs = stmt.executeQuery(sql);
+				while (rs.next()) {
+					BasketlistDTO dto = new BasketlistDTO();
+					dto.setCode(rs.getInt("code"));
+					dto.setCname(rs.getString("cname"));
+					dto.setCnt(rs.getInt("cnt"));
+					dto.setPrice(rs.getInt("price"));
 					list.add(dto.getArray());
 				}
 			}
